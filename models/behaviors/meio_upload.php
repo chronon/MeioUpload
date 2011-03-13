@@ -891,12 +891,12 @@ class MeioUploadBehavior extends ModelBehavior {
 		$phpThumb->setSourceFilename($source);
 
 		if ($params['maxDimension'] == 'w') {
-			$phpThumb->w = $params['thumbWidth'];
+			$phpThumb->setParameter('w', $params['thumbWidth']);
 		} else if ($params['maxDimension'] == 'h') {
-			$phpThumb->h = $params['thumbHeight'];
+			$phpThumb->setParameter('h', $params['thumbHeight']);
 		} else {
-			$phpThumb->w = $params['thumbWidth'];
-			$phpThumb->h = $params['thumbHeight'];
+			$phpThumb->setParameter('w', $params['thumbWidth']);
+			$phpThumb->setParameter('h', $params['thumbHeight']);
 		}
 
 		$phpThumb->setParameter('zc', $this->__fields[$model->alias][$fieldName]['zoomCrop']);
@@ -906,17 +906,17 @@ class MeioUploadBehavior extends ModelBehavior {
 		if (isset($params['watermark'])){
 			$phpThumb->fltr = array("wmi|". IMAGES . $params['watermark']."|BR|50|5");
 		}
-		$phpThumb->q = $params['thumbnailQuality'];
+		$phpThumb->setParameter('q', $params['thumbnailQuality']);
 
-		$imageArray = explode(".", $source);
-		$phpThumb->config_output_format = $imageArray[1];
-		unset($imageArray);
+		// set the output format based on the extension of the file ($source)
+		$outputFormat = pathinfo($source, PATHINFO_EXTENSION);
+		$phpThumb->setParameter('config_output_format', $outputFormat);
 
-		$phpThumb->config_prefer_imagemagick = $this->__fields[$model->alias][$fieldName]['useImageMagick'];
-		$phpThumb->config_imagemagick_path = $this->__fields[$model->alias][$fieldName]['imageMagickPath'];
+		$phpThumb->setParameter('config_prefer_imagemagick', $this->__fields[$model->alias][$fieldName]['useImageMagick']);
+		$phpThumb->setParameter('config_imagemagick_path', $this->__fields[$model->alias][$fieldName]['imageMagickPath']);
 
 		// Setting whether to die upon error
-		$phpThumb->config_error_die_on_error = true;
+		$phpThumb->setParameter('config_error_die_on_error', true);
 		// Creating thumbnail
 		if ($phpThumb->GenerateThumbnail()) {
 			if (!$phpThumb->RenderToFile($target)) {
